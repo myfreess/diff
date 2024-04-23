@@ -36,6 +36,9 @@ fn shortst_edit(a : Array[Line], b : Array[Line]) -> Int {
     for k = -d; k < d + 1; k = k + 2 {
       let mut x = 0
       let mut y = 0
+      // if d == 0 {
+      //   x = 0
+      // }
       if k == -d || (k != d && v[k - 1] < v[k + 1]) {
         x = v[k + 1]
       } else {
