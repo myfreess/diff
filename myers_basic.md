@@ -216,33 +216,30 @@ fn Line::new(number : Int, text : String) -> Line {
 }
 ```
 
-然后定义一个辅助函数，它将一个字符串按照换行符分割成`Array[Line]`。这里需要注意的是，行号是从1开始的。
+然后定义一个辅助函数，它将一个字符串按照换行符分割成`Vec[Line]`。这里需要注意的是，行号是从1开始的。
 
 ```rust
-fn lines(str : String) -> Array[Line] {
+fn lines(str : String) -> @vec.Vec[Line] {
   let mut line_number = 0
   let buf = Buffer::make(50)
-  let mut lst = List::Nil
+  let vec = @vec.Vec::new()
   for i = 0; i < str.length(); i = i + 1 {
     let ch = str[i]
+    buf.write_char(ch)
     if ch == '\n' {
       let text = buf.to_string()
       buf.reset()
       line_number = line_number + 1
-      lst = List::[Line::new(line_number, text)] + lst
-    } else {
-      buf.write_char(ch)
+      vec.push(Line::new(line_number, text))
     }
   } else {
-    let idx = line_number - 1
-    let arr = Array::make(line_number, Line::new(-1, ""))
-    loop lst, idx {
-      Nil, _ => arr
-      Cons(line, rest), idx => {
-        arr[idx] = line
-        continue rest, idx - 1
-      }
+    // 可能文本不以换行符为结尾
+    let text = buf.to_string()
+    if text != "" {
+      line_number = line_number + 1
+      vec.push(Line::new(line_number, text))
     }
+    vec
   }
 }
 ```
@@ -280,7 +277,7 @@ fn op_set[T](self : BPArray[T], idx : Int, elem : T) -> Unit {
 现在我们可以开始编写搜索函数了，不过，搜索出完整的路径是比较复杂的，我们的第一个目标是搜索出最短路径的长度(大小和搜索深度一样). 我们先展示它的基本框架：
 
 ```rust
-fn shortst_edit(a : Array[Line], b : Array[Line]) -> Int {
+fn shortst_edit(a : @vec.Vec[Line], b : @vec.Vec[Line]) -> Int {
   let n = a.length()
   let m = b.length()
   let max = n + m
@@ -345,7 +342,7 @@ if k == -d || (k != d && v[k - 1] < v[k + 1]) {
 综合上面的所有步骤，我们可以得到这样的代码：
 
 ```rust
-fn shortst_edit(a : Array[Line], b : Array[Line]) -> Int {
+fn shortst_edit(a : @vec.Vec[Line], b : @vec.Vec[Line]) -> Int {
   let n = a.length()
   let m = b.length()
   let max = n + m

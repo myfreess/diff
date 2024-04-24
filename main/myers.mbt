@@ -26,7 +26,7 @@ fn op_set[T](self : BPArray[T], idx : Int, elem : T) -> Unit {
 }
 
 
-fn shortst_edit(a : Array[Line], b : Array[Line]) -> Int {
+fn shortst_edit(a : @vec.Vec[Line], b : @vec.Vec[Line]) -> Int {
   let n = a.length()
   let m = b.length()
   let max = n + m
