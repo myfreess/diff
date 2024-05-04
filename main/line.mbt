@@ -13,12 +13,13 @@ fn lines(str : String) -> @vec.Vec[Line] {
   let vec = @vec.Vec::new()
   for i = 0; i < str.length(); i = i + 1 {
     let ch = str[i]
-    buf.write_char(ch)
     if ch == '\n' {
       let text = buf.to_string()
       buf.reset()
       line_number = line_number + 1
       vec.push(Line::new(line_number, text))
+    } else {
+      buf.write_char(ch)
     }
   } else {
     // 可能文本不以换行符为结尾
