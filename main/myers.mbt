@@ -36,14 +36,14 @@ fn op_set[T](self : BPArray[T], idx : Int, elem : T) -> Unit {
 }
 
 
-fn shortst_edit(a : @vec.Vec[Line], b : @vec.Vec[Line]) -> List[(BPArray[Int], Int)] {
+fn shortst_edit(a : Array[Line], b : Array[Line]) -> Array[(BPArray[Int], Int)] {
   let n = a.length()
   let m = b.length()
   let max = n + m
   let v = BPArray::make(2 * max + 1, 0)
-  let mut trace = List::Nil
+  let trace = []
   fn push(v : BPArray[Int], d : Int) -> Unit {
-    trace = Cons((v, d), trace)
+    trace.push((v, d))
   }
   // v[1] = 0
   for d = 0; d < max + 1; d = d + 1 {
@@ -75,15 +75,56 @@ fn shortst_edit(a : @vec.Vec[Line], b : @vec.Vec[Line]) -> List[(BPArray[Int], I
   }
 }
 
-fn backtrack(x : Int, y : Int, trace : List[(BPArray[Int], Int)]) -> List[(Int, Int)] {
-  let mut x = x
-  let mut y = y
-  let mut positions = List::Nil
-  fn push(x : Int, y : Int) -> Unit {
-    positions = Cons((x, y), positions)
+enum Edit {
+  Insert(~new : Line)
+  Delete(~old : Line)
+  Equal(~old : Line, ~new : Line) // old, new
+} derive(Debug, Show)
+
+
+
+
+let line_width = 4
+
+fn pad_right(s : String, width : Int) -> String {
+  String::make(width - s.length(), ' ') + s
+}
+
+fn print_edit(edit : Edit) -> String {
+  match edit {
+    Insert(_) as edit => {
+      let tag = "+"
+      let old_line = pad_right("", line_width)
+      let new_line = pad_right(edit.new.number.to_string(), line_width)
+      let text = edit.new.text
+      "\(tag) \(old_line) \(new_line)    \(text)"
+    }
+    Delete(_) as edit => {
+      let tag = "-"
+      let old_line = pad_right(edit.old.number.to_string(), line_width)
+      let new_line = pad_right("", line_width)
+      let text = edit.old.text
+      "\(tag) \(old_line) \(new_line)    \(text)"
+    }
+    Equal(_) as edit => {
+      let tag = " "
+      let old_line = pad_right(edit.old.number.to_string(), line_width)
+      let new_line = pad_right(edit.new.number.to_string(), line_width)
+      let text = edit.old.text
+      "\(tag) \(old_line) \(new_line)    \(text)"
+    }
   }
-  trace.iter(fn (vd) {
-    let (v, d) = vd
+}
+
+fn backtrack(a : Array[Line], b : Array[Line], trace : Array[(BPArray[Int], Int)]) -> Array[Edit] {
+  let mut x = a.length()
+  let mut y = b.length()
+  let edits = []
+  fn push(edit : Edit) -> Unit {
+    edits.push(edit)
+  }
+  for i = trace.length() - 1; i >= 0; i = i - 1 {
+    let (v, d) = trace[i]
     let k = x - y
     let prev_k = if k == -d || (k != d && v[k - 1] < v[k + 1]) {
       k + 1
@@ -92,23 +133,33 @@ fn backtrack(x : Int, y : Int, trace : List[(BPArray[Int], Int)]) -> List[(Int, 
     }
     let prev_x = v[prev_k]
     let prev_y = prev_x - prev_k
-    push(x, y)
     while x > prev_x && y > prev_y {
       x = x - 1
       y = y - 1
-      push(x, y)
+      push(Equal(old = a[x], new = b[y]))
     }
     if d > 0 {
+      if x == prev_x {
+        push(Insert(new = b[prev_y]))
+      } else if y == prev_y {
+        push(Delete(old = a[prev_x]))
+      }
       x = prev_x
       y = prev_y
     }
-  })
-  return positions
+  }
+  return edits
 }
 
-fn diff(a : @vec.Vec[Line], b : @vec.Vec[Line]) -> List[(Int, Int)] {
+fn diff(a : Array[Line], b : Array[Line]) -> Array[Edit] {
   let trace = shortst_edit(a, b)
-  let x = a.length()
-  let y = b.length()
-  backtrack(x, y, trace)
+  backtrack(a, b, trace)
+}
+
+fn print_diff(diff : Array[Edit]) -> Unit {
+  for i = diff.length() - 1; i >= 0; i = i - 1 {
+    diff[i] 
+    |> print_edit 
+    |> println
+  }
 }
