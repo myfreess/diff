@@ -9,7 +9,7 @@ fn Line::new(number : Int, text : String) -> Line {
 
 fn lines(str : String) -> Array[Line] {
   let mut line_number = 0
-  let buf = Buffer::make(50)
+  let buf = Buffer::new(size_hint = 50)
   let arr = []
   for i = 0; i < str.length(); i = i + 1 {
     let ch = str[i]
