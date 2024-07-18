@@ -36,3 +36,12 @@ fn print_edit(edit : Edit) -> String {
     }
   }
 }
+
+fn print_diff(diff : Array[Edit]) -> Unit {
+  for i = 0; i < diff.length(); i = i + 1 {
+    diff[i] 
+    |> print_edit 
+    |> println
+  }
+}
+

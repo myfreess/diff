@@ -1,41 +1,4 @@
 
-type BPArray[T] Array[T] // BiPolar Array 
-  
-
-fn BPArray::make[T](capacity : Int, default : T) -> BPArray[T] {
-  let arr = Array::make(capacity, default)
-  BPArray(arr)
-}
-
-fn copy(self : BPArray[Int]) -> BPArray[Int] {
-  let BPArray(arr) = self
-  let newarr = Array::make(arr.length(), 0)
-  for i = 0; i < arr.length(); i = i + 1 {
-    newarr[i] = arr[i]
-  } else {
-    BPArray(newarr)
-  }
-}
-
-fn op_get[T](self : BPArray[T], idx : Int) -> T {
-  let BPArray(arr) = self
-  if idx < 0 {
-    arr[arr.length() + idx]
-  } else {
-    arr[idx]
-  }
-}
-
-fn op_set[T](self : BPArray[T], idx : Int, elem : T) -> Unit {
-  let BPArray(arr) = self
-  if idx < 0 {
-    arr[arr.length() + idx] = elem
-  } else {
-    arr[idx] = elem
-  }
-}
-
-
 fn shortst_edit(a : Array[Line], b : Array[Line]) -> Array[(BPArray[Int], Int)] {
   let n = a.length()
   let m = b.length()
@@ -78,10 +41,7 @@ fn shortst_edit(a : Array[Line], b : Array[Line]) -> Array[(BPArray[Int], Int)] 
 fn backtrack(a : Array[Line], b : Array[Line], trace : Array[(BPArray[Int], Int)]) -> Array[Edit] {
   let mut x = a.length()
   let mut y = b.length()
-  let edits = []
-  fn push(edit : Edit) -> Unit {
-    edits.push(edit)
-  }
+  let edits = Array::new(capacity = trace.length())
   for i = trace.length() - 1; i >= 0; i = i - 1 {
     let (v, d) = trace[i]
     let k = x - y
@@ -95,13 +55,13 @@ fn backtrack(a : Array[Line], b : Array[Line], trace : Array[(BPArray[Int], Int)
     while x > prev_x && y > prev_y {
       x = x - 1
       y = y - 1
-      push(Equal(old = a[x], new = b[y]))
+      edits.push(Equal(old = a[x], new = b[y]))
     }
     if d > 0 {
       if x == prev_x {
-        push(Insert(new = b[prev_y]))
+        edits.push(Insert(new = b[prev_y]))
       } else if y == prev_y {
-        push(Delete(old = a[prev_x]))
+        edits.push(Delete(old = a[prev_x]))
       }
       x = prev_x
       y = prev_y
@@ -115,10 +75,3 @@ fn diff(a : Array[Line], b : Array[Line]) -> Array[Edit] {
   backtrack(a, b, trace)
 }
 
-fn print_diff(diff : Array[Edit]) -> Unit {
-  for i = diff.length() - 1; i >= 0; i = i - 1 {
-    diff[i] 
-    |> print_edit 
-    |> println
-  }
-}
