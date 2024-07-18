@@ -26,6 +26,14 @@ fn delta(self : Box) -> Int {
   self.width() - self.height()
 }
 
+fn is_odd(n : Int) -> Bool {
+  n.land(1) == 1
+}
+
+fn is_even(n : Int) -> Bool {
+  n.land(1) == 0
+}
+
 fn forward(self : Box, vf : BPArray[Int], vb : BPArray[Int], d : Int, a : Array[Line], b : Array[Line]) -> Snake? {
   for k = d; k >= -d; k = k - 2 {
     let c = k - self.delta()
@@ -45,7 +53,7 @@ fn forward(self : Box, vf : BPArray[Int], vb : BPArray[Int], d : Int, a : Array[
       y = y + 1
     }
     vf[k] = x
-    if self.delta().land(1) == 1 && (c >= -(d - 1) && c <= d - 1) && y >= vb[c] {
+    if is_odd(self.delta()) && (c >= -(d - 1) && c <= d - 1) && y >= vb[c] {
       return Some(Snake::{ start : (px, py), end : (x, y) })
     }
   }
@@ -71,7 +79,7 @@ fn backward(self : Box, vf : BPArray[Int], vb : BPArray[Int], d : Int, a : Array
       y = y - 1
     }
     vb[c] = y
-    if self.delta().land(1) == 0 && (k >= -d && k <= d) && x <= vf[k] {
+    if is_even(self.delta()) && (k >= -d && k <= d) && x <= vf[k] {
       return Some(Snake::{ start : (x, y), end : (px, py) })
     }
   }
