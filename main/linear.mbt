@@ -71,7 +71,7 @@ fn backward(self : Box, vf : BPArray[Int], vb : BPArray[Int], d : Int, a : Array
       y = y - 1
     }
     vb[c] = y
-    if self.delta() % 2 == 0 && (k >= -d && k <= d) && x <= vf[k] {
+    if self.delta().land(1) == 0 && (k >= -d && k <= d) && x <= vf[k] {
       return Some(Snake::{ start : (x, y), end : (px, py) })
     }
   }
