@@ -92,7 +92,7 @@ fn midpoint(self : Box, a : Array[Line], b : Array[Line]) -> Snake? {
   }
   let max = {
     let half = self.size() / 2
-    if half * 2 < self.size() {
+    if is_odd(self.size()) {
       half + 1
     } else {
       half
@@ -116,7 +116,7 @@ fn midpoint(self : Box, a : Array[Line], b : Array[Line]) -> Snake? {
   }
 }
 
-fn find_path(box : Box, a : Array[Line], b : Array[Line]) -> Option[Iter[(Int, Int)]] {
+fn find_path(box : Box, a : Array[Line], b : Array[Line]) -> Iter[(Int, Int)]? {
   let snake = midpoint(box, a, b)?
   let start = snake.start
   let end = snake.end
@@ -130,7 +130,7 @@ fn find_path(box : Box, a : Array[Line], b : Array[Line]) -> Option[Iter[(Int, I
   Some(head.concat(tail))
 }
 
-fn linear_diff(a : Array[Line], b : Array[Line]) -> Option[Array[Edit]] {
+fn linear_diff(a : Array[Line], b : Array[Line]) -> Array[Edit]? {
   let initial_box = Box::{ left : 0, top : 0, right : a.length(), bottom : b.length() }
   let path = find_path(initial_box, a, b)?
   // path length >= 2
